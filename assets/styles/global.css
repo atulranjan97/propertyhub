@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+/* Any custom css that you want to write you can put right in here, example shown below, so any global styles can be written here  */
+/* div {
+    color: red;
+} */
+
+@theme {
+    --font-sans: var(--font-poppins), sans-serif;
+    --grid-cols-70-30: 70% 28%;
+}

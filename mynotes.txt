@@ -1,0 +1,41 @@
+import Link from "next/link";
+
+const HomePage = () => {
+  // return ( <div className="text-2xl font-sans">HomePage </div> );
+  return (
+    <div>
+      <h1 className="text-3xl">Welcome</h1>
+      {/* to use the Link component from next */}
+      {/* <Link href={'/properties'} className="text-blue-700 hover:underline">Go To Properties</Link> */}
+
+      {/* <a> reloads the page */}
+      {/* <a href={'/properties'} className="text-blue-700 hover:underline">Go To Properties</a> */}
+
+      {/* you can add query params */}
+      {/* <Link
+        href={"/properties?name=test"}
+        className="text-blue-700 hover:underline"
+      >
+        Go To Properties
+      </Link> */}
+
+      {/* you can also pass an object */}
+      <Link
+        href={{
+          pathname: "properties",
+          query: { name: "test" },
+        }}
+        className="text-blue-700 hover:underline"
+      >
+        Go To Properties
+      </Link>
+    </div>
+  );
+};
+
+export default HomePage;
+
+// Remember each page is a component and these are all actually rendered on the server by default, we will later see how we can change it to a client as we can create client components as we want, but by default these are rendered on the server and then the html and css and all that is sent to the client
+
+// Routing with the Link component
+// Next.js comes with the Link component so we can link from page to page and it actually uses client side routing and is really fast and doesn't refresh the page like an <a> tag would. so it's similar to what you would do with CRA/vite-with-react-plugin where you would use Link from react-router, although with that link component you use a 'to' attribute but with this one you still use an 'href'

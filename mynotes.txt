@@ -39,3 +39,71 @@ export default HomePage;
 
 // Routing with the Link component
 // Next.js comes with the Link component so we can link from page to page and it actually uses client side routing and is really fast and doesn't refresh the page like an <a> tag would. so it's similar to what you would do with CRA/vite-with-react-plugin where you would use Link from react-router, although with that link component you use a 'to' attribute but with this one you still use an 'href'
+
+
+                                                            ---NextAuth---
+Next Auth is a complete authentication solution for next.js applications.  
+Its easy to set-up  and it supports a ton of different authentication provider
+We're gonna be using Google provider for this project, so you'll have to create a google project and get the client_id and client_secret
+We can also use a standard username and password login, however it is suggested to use something like Google, Github etc
+
+---How Next Auth works---
+1. Serverless function for authentication: (So we use a serverless function for authentication. Next auth uses API routes often implemented as serverless functions to handle authentication related operations like signing in, signing out and session management, so we'll be creating API routes but we're basically passing it off to next auth)
+2. Create a session: (so when a user logs in, next auth creates a session for that user and the session contains information like user's identity and authentication state, and the session is signed with a secret key to ensure its integrity and prevent tampering)
+3. Store the session: (It store the session so the session data is stored in a cookie on the client side. That cookie is then sent with each request to the server)
+4. Verifying the session: (and then Verifying the session so on subsequent request the server checks the cookie to verify the session, and it does this by validating the session signature using a secret key. And if the signature is valid and the data is intact, then the server processes the request as authenticated)
+5. Accessing Protect Routes: (and then finally accessing protected routes so the client send the cookie with every request and we get access to any routes that are protected.)
+Next auth uses middleware or API routes to use that session data from the cookie to determine if the user is authorized to access that requested resource. So, for example, we're gonna have a page where we can create a property and that's gonna be a protected route, you're not gonna be able to go to that page if you're not logged in
+
+There're ton of providers mentioned below:
+Google, Facebook, Twitter, Github, Discord, Slack, Dropbox, Auth0, Netlify, Okta, Reddit, Salesforce, Todoist, Spotify, Twitch, Zoom
+So, Oauth is an open standard for access delegation and this is what allows a user to grant a third-party website or application to access their information without sharing their actual credentials, so we can't see you actual Google passoword or fb password or anything like that, which makes it very secure, so it's secure by default.
+
+---Secure By Default---
+- Promotes the use of passwordless sign-in mechanisms, you password is not shared, its not known. 
+- Its design to be secured by default and encourages the best practices for safegaurding user data 
+- It uses cross-site request forgery tokens on POST routes (sign in, sign out)
+- There is a Default cookie policy aims for the most restrictive policy appropriate for each cookie
+- When JSON web token are enabled, they are encrypted by default
+- Auto generate symmetric signin and encryption keys for developer convenience
+- It features tab window syncing and keep alive messages to support short lived sessions
+- It attempts to Implement the latest guidance published by the open web application security project. 
+So using something like next-auth with a provider is more secure than trying to implement the authentication youself. It's a complete solution thats been tested  and its used by many developers and big companies
+And these days, there's very few cases where developers create a completely custom authentication solution over using something like next-auth. Not only is it more secure, but it's much easier to implement
+
+---setup Oauth within the Google console to get our client_id and client_secret 
+Google Cloud Console Setup
+  Before writing any code, you must configure OAuth credentials in Google Cloud Console
+  1. Create a project at Google Cloud Console(at https://console.cloud.google.com )
+  2. Configure OAuth consent screen:
+      - Select "External" user type
+      - Add app name, user support email, and developer contact
+  3. Create OAuth 2.0 credentials:
+      - Choose "Web application" as application type
+      - Add authorized redirect URI: http://localhost:3000/api/auth/callback/google (for development)
+      - For production: https://yourdomain.com/api/auth/callback/google
+  4. Copy your credentials:
+      - Client ID
+      - Client Secret
+
+  There are couple other environments that next auth uses:
+    - search next auth environment variables, click the first link that says `Options|NextAuth.js`
+    Copy your credentials:
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_URL_INTERNAL=http://localhost:3000
+      -NEXTAUTH_SECRET=
+      Generate a secure secret key: 
+        openssl rand -base64 32   (create a good value(secret key) on the command line via this `openssl` command)
+      NOTE: `NEXTAUTH_SECRET` is mandatory in production and used to encrypt cookies and JWT tokens
+
+---Implement next auth into our app -Google provider--- 
+Now we're gonna be using google provider for authentication, now you should already have a google project set up with a client_id and client_secret in your .env file(by following the instruction in the first lesson of this section)
+Now we're gonna create an API route at `/api/auth` and that will handle the authentication
+We also need to create a provider component that will wrap the layout component or within the layout component, so that everything within our application has access to the session
+And we also need to create a file that will contain the `Options` object for NextAuth, and this object will contain the google provider and the callback functions for when a user signs in and when a session is created,
+-> so first thing we need to do is install NextAuth (npm i next-auth)
+-> Add api route (if you go to /api/auth/(anything), it's gonna be directed to next-auth)
+-> api -> auth(create this folder) -> [...nextauth] (create this folder) -> route.js(create)
+-> Now we need to create a provider
+-> We're gonna have a seperate file called `authOptions` where we want to put following object and the reason that we want to do that is because we're gonna need this in another place as well, so I just wanna have this authOptions so i can easily just export it and bring it into anywhere else we need it.
+-> utils(create this folder in root) -> authOptions.js(create this file)

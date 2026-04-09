@@ -4,9 +4,14 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',  // sirf http wali images allowed
-        hostname: 'lh3.googleusercontent.com',  // sirf Google ke server se images allowed
-        pathname: '**',   // is domain ke sare paths allowed
+        protocol: 'https', // sirf http wali images allowed
+        hostname: 'lh3.googleusercontent.com', // sirf Google ke server se images allowed
+        pathname: '**', // is domain ke sare paths allowed
+      },
+      {
+        protocol: 'https', // sirf http wali images allowed
+        hostname: 'res.cloudinary.com', // sirf cloudinary ke server se images allowed
+        pathname: '**', // is domain ke sare paths allowed
       },
     ],
   },
@@ -14,9 +19,8 @@ const nextConfig = {
 
 export default nextConfig;
 
-
 /* ---------------------Displaying Google Profile Images in Next.js (NextAuth)---------------------
-When using NextAuth.js with Google authentication in a Next.js application, the user’s profile image is available through session.user.image. However, a common problem arises when trying to display this image using the built-in <Image /> component. By default, Next.js does not allow loading images from external URLs for security and performance reasons. Since Google profile images are hosted on an external domain (typically https://lh3.googleusercontent.com/...), the image may fail to load or appear broken.
+When using NextAuth.js with Google authentication in a Next.js application, the user’s profile image is available through `session.user.image`. However, a common problem arises when trying to display this image using the built-in <Image /> component. By default, Next.js does not allow loading images from external URLs for security and performance reasons. Since Google profile images are hosted on an external domain (typically https://lh3.googleusercontent.com/...), the image may fail to load or appear broken.
 
 To solve this issue, Next.js requires explicit configuration to allow images from trusted external sources. This is done in the next.config.js file using the images configuration. The modern and recommended approach is to use remotePatterns, which provides more control and security compared to the older domains option. In this configuration, you define the allowed protocol (such as https), the hostname (such as lh3.googleusercontent.com), and the pathname pattern (** means all paths are allowed). This tells Next.js that it is safe to fetch and optimize images from this specific source.
 

@@ -107,3 +107,34 @@ And we also need to create a file that will contain the `Options` object for Nex
 -> Now we need to create a provider
 -> We're gonna have a seperate file called `authOptions` where we want to put following object and the reason that we want to do that is because we're gonna need this in another place as well, so I just wanna have this authOptions so i can easily just export it and bring it into anywhere else we need it.
 -> utils(create this folder in root) -> authOptions.js(create this file)
+
+---Server Actions---
+They allow us to run server side functions in our next app. And we already have used server components which are components that render on the server. But server actions are functions that run on the server and we can essentially do anything we want with them. We can also submit forms directly to an action using the action attribute. So instead of using an onClick handler like we would with client sides
+Now actions can also be run within a client component. So they're very flexible and they can be used in different ways. And you also aren't limited to actions with forms. They can be invoked from form event handlers, even within a useEffect hook.  
+Now we briefly went over API routes and they're a vital part of Next.js, You can use them to execute server side code, It would be a good idea if you need your API routes to be exposed for other projects, but if you're building a single app like we are then actions are much more efficient and easier way to go, and we can run these function directly in our next app, we don't need to worry about setting up API routes and making extra HTTP requests
+
+A server Actions can be defined with the React 'use server' directive. You can place the directive at the top of an async function to mark the function as a server action
+
+Traditional MERN stack (MongoDB, Express, React, Node) me flow kaafi clear aur layered hota tha. Frontend (React) aur backend (Express/Node) completely alag hote the. Jab user form submit karta tha—maan lo “add property” jaisa case—React se ek HTTP request (usually `fetch` ya `axios`) API endpoint par jaati thi, jaise `/api/properties`. Ye request backend ke Express server tak pahunchti thi, jahan route handler likha hota tha. Wahan validation hoti thi, phir MongoDB me data save hota tha, aur response wapas client ko milta tha. Agar image upload karni hoti thi, to middleware jaise `multer` use hota tha jo file ko stream karke ya disk/cloud me store karta tha. Is approach me separation of concerns clear tha: frontend sirf UI handle karta tha, backend pura business logic aur DB.
+
+Ab Next.js (especially App Router + Server Actions) me ye boundary kaafi blur ho gayi hai. Yahan tum ek hi project me frontend aur backend dono likhte ho. Server Actions ka concept ye hai ki tum directly component ke andar ya ek server file me function likh ke usko form ke `action` me pass kar sakte ho. Jab form submit hota hai, wo function server pe execute hota hai—beech me explicit API route banane ki zarurat nahi padti. Iska matlab ye hua ki jo kaam pehle `fetch → API → controller → DB` ke through hota tha, ab wo directly `form → server function → DB` ho gaya. Code kam ho gaya, flow simple lagta hai, aur chhoti applications ke liye ye kaafi powerful hai.
+
+Lekin internally kya ho raha hai, wo samajhna important hai. Jab tum Server Action use karte ho, Next.js background me ek special request bana ke us server function ko call karta hai—bas tumhe manually API route likhne ki zarurat nahi padti. Ye abstraction developer experience ko better banata hai, lekin iska matlab ye nahi ki HTTP layer gayab ho gayi hai—wo bas hidden ho gayi hai. Isi wajah se jab tum heavy data (jaise images) bhejte ho, to wo pura payload memory me load ho sakta hai, kyunki traditional backend jaisa streaming/middleware handling tum explicitly control nahi kar rahe hote.
+
+Isliye difference ye hai: MERN me tumhara full control hota hai request lifecycle par—tum decide karte ho kaise file handle hogi, kaise stream hogi, kaise memory manage hogi. Next.js Server Actions me convenience zyada hai, lekin control thoda kam ho jata hai, especially large payloads ke case me. Isi wajah se simple form data (text, numbers, small payloads) ke liye Server Actions perfect hain, lekin image upload jaise use cases me traditional API route ya direct cloud upload (jaise Cloudinary) abhi bhi better aur safer approach hai.
+
+
+---Cloudinary---
+so now we want to integrate Cloudinary. basically, we wanna be able to have the images that we select on 'add property' form to go up to cloudinary and then we want to get a response back, and we want to get the URLs for those images and put them in the database rather than just image name. 
+
+1. Create a cloudinary account
+2. Create a product environment
+3. Create a folder (go to `Media Explorer`). Eg: propertypulse (so basically I wanna make it so every image that we upload through our application goes to this specific folder).
+4. Click the gear icon(setting), this is where you can get your API Keys and API Secrets, and we need to put this in our .env
+5. add this in .env, 
+    CLOUDINARY_CLOUD_NAME=<YOUR_PRODUCT_ENVIRONMENT/CLOUDNAME>
+    CLOUDINARY_API_KEY=<YOUR-CLOUDINARY-KEY>
+    CLOUDINARY_API_SECRET=<YOUR-CLOUDINARY-SECRET>
+4. Install the cloudinary package (npm i cloudinary)
+5. Create `cloudinary.js` in config folder (this is where I wanna initialize the object and pass in our keys and that stuff)
+

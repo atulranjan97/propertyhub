@@ -1,33 +1,34 @@
-import Image from "next/image";
-import Link from "next/link";
+import Image from 'next/image';
+import Link from 'next/link';
 import {
   FaBed,
   FaBath,
   FaRulerCombined,
   FaMoneyBill,
   FaMapMarker,
-} from "react-icons/fa";
+} from 'react-icons/fa';
 
 const PropertyCard = ({ property, index }) => {
   const getRateDisplay = () => {
     const { rates } = property;
     if (rates.monthly) {
-      return `₹ ${rates.monthly.toLocaleString("en-IN")}/mo`;
+      return `₹ ${rates.monthly.toLocaleString('en-IN')}/mo`;
     } else if (rates.weekly) {
       return `₹ ${rates.weekly.toLocaleString()}/wk`;
     } else if (rates.nightly) {
       return `₹ ${rates.nightly.toLocaleString()}/night`;
     }
   };
+
   return (
     <div className="rounded-xl shadow-md relative">
       <Image
-        src={`/images/properties/${property.images[0]}`}
+        src={property.images[0]}
         alt=""
         width={0}
         height={0}
         sizes="100vw"
-        preload={index < 3}   // first three image ko lazy load mat karo, immediately load karo.
+        preload={index < 3} // first three image ko lazy load mat karo, immediately load karo.
         className="w-full h-auto rounded-t-xl"
       />
       <div className="p-4">
@@ -42,18 +43,18 @@ const PropertyCard = ({ property, index }) => {
         <div className="flex justify-center gap-4 text-gray-500 mb-4">
           {/* <p> */}
           <p className="flex items-center gap-1">
-            <FaBed className="md:hidden lg:inline" /> {property.beds}{" "}
+            <FaBed className="md:hidden lg:inline" /> {property.beds}{' '}
             <span className="md:hidden lg:inline">Beds</span>
           </p>
           {/* <p> */}
           <p className="flex items-center gap-1">
-            <FaBath className="md:hidden lg:inline" /> {property.baths}{" "}
+            <FaBath className="md:hidden lg:inline" /> {property.baths}{' '}
             <span className="md:hidden lg:inline">Baths</span>
           </p>
           {/* <p> */}
           <p className="flex items-center gap-1">
             <FaRulerCombined className="md:hidden lg:inline" />
-            {property.square_feet}{" "}
+            {property.square_feet}{' '}
             <span className="md:hidden lg:inline">sqft</span>
           </p>
         </div>

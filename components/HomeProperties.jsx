@@ -18,7 +18,7 @@ const HomeProperties = async () => {
             Recent Properties
           </h2>
           {recentProperties.length === 0 ? (
-            <p>No properties found</p>
+            <p className="text-center text-red-500">No properties found</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {recentProperties.map((property, index) => (

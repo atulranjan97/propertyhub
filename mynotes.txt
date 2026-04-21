@@ -138,3 +138,122 @@ so now we want to integrate Cloudinary. basically, we wanna be able to have the 
 4. Install the cloudinary package (npm i cloudinary)
 5. Create `cloudinary.js` in config folder (this is where I wanna initialize the object and pass in our keys and that stuff)
 
+-------------------------------------
+Jab tum Next.js App Router me **Server Component se Client Component ko data pass karte ho**, tab ek important rule hota hai: data **JSON-serializable** hona chahiye. Ab “JSON-serializable” ka matlab kya hai? Simple words me, aisa data jo `JSON.stringify()` se safely string me convert ho sake aur `JSON.parse()` se wapas same structure me aa jaye. Isme sirf basic types allowed hote hain: **string, number, boolean, null, arrays, aur plain objects** (simple `{}` jisme sirf key-value pairs ho). Lekin MongoDB/Mongoose ka data is rule ko tod deta hai, kyunki wo special types use karta hai jaise `ObjectId` (Mongo ka unique ID type), `Date` objects, aur kabhi-kabhi `Buffer`. Ye objects internally methods rakhte hain (jaise `toJSON`, `toString`, etc.) aur unka structure simple JSON jaisa nahi hota. Isi wajah se Next.js error deta hai: *“Only plain objects can be passed…”*.
+
+Technical level par samjho: Next.js Server Component se Client Component ko data bhejne ke liye us data ko **serialize** karta hai (network ke through bhejne layak format me convert karta hai). Ye process almost `JSON.stringify()` jaisa hota hai. Agar kisi object me custom prototype, methods, ya complex internal structure ho (jaise `new ObjectId()`), to wo proper tarike se serialize nahi hota, aur Next.js usse reject kar deta hai. Isi ko “non-serializable data” bolte hain.
+
+Ab `.lean()` ka role: jab tum Mongoose query me `.lean()` lagate ho, to wo Mongoose document (jo heavy object hota hai with methods like `.save()`, `.populate()`) ko ek **plain JavaScript object** me convert kar deta hai. Lekin important baat: `.lean()` sirf wrapper hataata hai, **data types convert nahi karta**. Isliye `_id` still `ObjectId` hi rehta hai, aur `createdAt` still `Date` object hi rehta hai. Matlab object plain hai, lekin uske andar ke values abhi bhi non-serializable ho sakte hain.
+
+Is problem ka solution hai **serialization step manually karna**. Jab tum `_id.toString()` karte ho, to tum complex `ObjectId` ko simple string me convert kar dete ho. Jab tum `date.toISOString()` use karte ho, to `Date` object ek ISO string (e.g. `"2026-04-09T04:32:58.549Z"`) me convert ho jata hai. Ye dono fully JSON-safe hote hain. Ek shortcut hai `JSON.parse(JSON.stringify(data))`, jo internally sab non-serializable cheezon ko string me convert kar deta hai aur ek clean plain object return karta hai. Is process ko hi “data serialization” bolte hain.
+
+Short me pura concept:
+MongoDB → complex data types (ObjectId, Date) → `.lean()` → plain object but still complex values → **serialization (stringify / manual convert)** → fully JSON-safe object → Client Component.
+Agar tum ye last step skip kar doge, to Next.js App Router me hamesha ye error aayega.
+
+---------------------
+import { revalidatePath } from "next/cache";
+
+---------------------
+array `at` method (add this in your js lessons)
+
+---------------------------Geocode for latitude and longitude--------------------------
+so, we wanna get map on our property details page and there's a couple things we need to do. We're gonna be using `mapbox` for the actual map. But before we do that we need to get the latitude and longitude of the listings so that we can place the marker on the map. And we can do that with Google geocoding and a package called `react-geocode`.
+
+To use geocoding you need to go to your `console.cloud.google.com` and you need to get an `API key` for geocoding
+- Go to API & Services
+- click on `Enable APIS and Services`
+- search for geocode
+- click on geocoding API (you're gonna see an enable button if yours isn't enabled already)
+- after enabling, click manage button
+- now look for `Geocoding API` card section and in it click on `keys`
+- copy the key and add it in you .env file by the name `NEXT_PUBLIC_GOOGLE_GEOCODE_API_KEY`
+
+- Install react-geocode. We might as well as install the other map GL dependencies as well to work with map box. 
+- npm i react-geocode mapbox-gl react-map-gl
+
+now in the `PropertyMap.jsx` component I wanna start to be able to get the latitude because that's what we need to is we need to take the property address, run it through a function called `fromAddress` that comes with `react-geocode` package and get the latitude and longitude so that we can place it on the map. 
+
+Once we get the latitude & longitude, now we wanna put the map in. so we're using `mapbox`, we're gonna need an API key
+- go to mapbox.com
+- signup/login
+- click on `Go to account`
+- and if you go to your dashboard you should be able to create a token and then just copy that. 
+- NEXT_PUBLIC_MAPBOX_TOKEN=your_token (add this in your .env file)
+
+
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+## Next.js + Leaflet SSR Error — Revision Notes
+
+---
+
+### Problem Kya Thi
+
+Jab project run kiya, browser console mein ek error aaya jiska message tha — *"window is not defined"* aur Next.js automatically server rendering se client rendering pe switch ho gaya. Yahi root problem thi.
+
+---
+
+### Next.js Kaise Kaam Karta Hai — Pehle Ye Samjho
+
+Next.js ek fullstack framework hai jo code **do jagah** chalata hai — pehle server pe, phir browser pe. Jab user koi page open karta hai, toh server pehle poora HTML bana ke browser ko bhejta hai. Isse page jaldi dikhta hai aur SEO bhi better hota hai. Uske baad browser mein JavaScript load hoti hai aur page interactive ho jaata hai. Is poori process ko **Server Side Rendering (SSR)** kehte hain.
+
+---
+
+### Error Kyun Aaya
+
+Leaflet ek map library hai jo **sirf browser mein kaam karti hai**. Woh internally `window` aur `document` jaisi cheezein use karti hai jo sirf browser ke paas hoti hain. Server ek Node.js environment hai — wahan `window` exist hi nahi karta. Toh jab Next.js ne server pe Leaflet ko import kiya, Leaflet ne `window` dhundha, nahi mila, aur crash ho gaya.
+
+---
+
+### `'use client'` Ne Kaam Kyun Nahi Kiya
+
+Yahan sabse important aur confusing concept hai. `'use client'` likhne ke baad bhi error aa raha tha, toh lagta hai ki ye directive kuch kaam nahi karta — lekin aisa nahi hai.
+
+`'use client'` ka sirf itna matlab hai ki **React is component ko client pe render karega**. Lekin Next.js build process ke dauran **server sabhi modules ko import karke check karta hai** — chahe unpe `'use client'` laga ho ya na laga ho. Leaflet usi import step pe crash karti hai, React render hone se pehle hi. Isliye `'use client'` se kuch farak nahi pada.
+
+Ek aasaan analogy — socho `'use client'` ek director hai jo kehta hai "ye scene sirf set pe shoot hoga." Lekin Leaflet toh script padhte waqt hi stage pe aa gayi aur girr gayi — shooting se pehle hi.
+
+---
+
+### Pehla Error — `ssr: false` Server Component Mein
+
+Pehla solution try kiya — `PropertyDetails.jsx` mein `dynamic()` with `ssr: false` use kiya. Lekin ek naya error aaya ki **`ssr: false` sirf Client Components mein allowed hai**, Server Components mein nahi.
+
+`PropertyDetails.jsx` ek Server Component tha kyunki usme `'use client'` nahi likha tha. Next.js mein by default har component Server Component hota hai. `dynamic({ ssr: false })` sirf tab kaam karta hai jab woh component khud Client Component ho.
+
+---
+
+### Final Solution — Wrapper Component
+
+Sabse clean solution tha ek **alag wrapper component** banana — `PropertyMapWrapper.jsx`. Isme teen cheezein ki gayi:
+
+Pehli — file ke upar `'use client'` likha, toh ye poora component Client Component ban gaya. Doosri — isi file mein `dynamic(() => import('./PropertyMap'), { ssr: false })` use kiya. Teesri — `PropertyDetails.jsx` mein `PropertyMap` ki jagah `PropertyMapWrapper` import kiya.
+
+Is approach ka faida ye raha ki `PropertyDetails.jsx` **Server Component hi raha** — sirf map wala chhota sa hissa client pe gaya. Next.js ka proper pattern yehi hai ki jitna ho sake server pe rakho, sirf zaroorat wali cheez client pe bhejo.
+
+---
+
+### `dynamic({ ssr: false })` Asal Mein Kya Karta Hai
+
+Ye Next.js ko instruction hai ki **is module ko server pe bilkul mat chhuo** — isko sirf browser mein load karo jab page ready ho. Jab tak browser mein JavaScript load nahi hoti, wahan ek loading state ya khaali jagah dikhti hai. Jaise hi browser ready hota hai, tab Leaflet load hoti hai, `window` available hota hai, aur map render ho jaata hai.
+
+---
+
+### Ek Line Mein Yaad Rakhne Wali Baat
+
+> `'use client'` React ko batata hai kahan render karna hai. `dynamic({ ssr: false })` Next.js ko batata hai kahan **import** karna hai. Map fix karne ke liye dono cheezein ek saath chahiye thi — isliye wrapper component banana pada.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+---------------------------Share Button-----------------------
+We're gonna be using `react-share` npm package which will give us little icons(fb, whatsapp, telegram etc) and we can share on these different networks and you can choose which one you want to use.
+- npm i react-share
+
+
+---------------------
+for navigation in client component, 
+- import {useRouter} from 'next/navigation'
+- const router = useRouter();  // initialize the router

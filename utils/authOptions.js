@@ -39,7 +39,7 @@ export const authOptions = {
       // 4. Return true to allow sign in
       return true;
     },
-    // Session callback function that modifies the session object
+    // Session callback function that modifies the session object (Add custom data to session)
     async session({ session }) {
       // 1. Get the user from database
       const user = await User.findOne({email: session.user.email});

@@ -7,6 +7,8 @@ import {
   FaMapMarker,
 } from "react-icons/fa";
 
+import PropertyMapWrapper from "./PropertyMapWrapper";
+
 const PropertyDetails = ({ property }) => {
   return (
     <main>
@@ -49,7 +51,7 @@ const PropertyDetails = ({ property }) => {
             <div className="text-gray-500 mr-2 font-bold">Monthly</div>
             <div className="text-2xl font-bold text-teal-500">
               {property.rates.monthly ? (
-                `₹ ${property.rates.monthly.toLocaleString("en-In")}`
+                `₹ ${property.rates.monthly.toLocaleString("en-IN")}`
               ) : (
                 <FaTimes className="text-red-700" />
               )}
@@ -91,7 +93,8 @@ const PropertyDetails = ({ property }) => {
       </div>
       {/* <!-- Map --> */}
       <div className="bg-white p-6 rounded-lg shadow-md mt-6">
-        <div id="map"></div>
+          {/* This works because the client-only logic is isolated in the wrapper */}
+          <PropertyMapWrapper property={property} />          
       </div>
     </main>
   );

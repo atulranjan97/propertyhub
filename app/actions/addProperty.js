@@ -79,7 +79,7 @@ async function addProperty(formData) {
   const newProperty = new Property(propertyData);
   await newProperty.save();
 
-  revalidatePath('/', 'layout');
+  revalidatePath('/', 'layout');    // tells Next.js to refresh cached data for a given path, so the next request gets fresh content instead of stale cached data.
 
   redirect(`/properties/${newProperty._id}`);
 }

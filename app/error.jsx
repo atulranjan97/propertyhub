@@ -16,10 +16,10 @@ const ErrorPage = ({ error }) => {
               Something Went Wrong
             </h1>
             <p className="text-gray-500 text-xl mb-10">
-              {/* {error.toString()} */}
-              {error.name === 'CastError'
+              {error.toString()}
+              {/* {error.name === 'CastError'
                 ? 'Invalid Property ID'
-                : 'Server Error'}
+                : 'Server Error'} */}
             </p>
             <Link
               href="/"

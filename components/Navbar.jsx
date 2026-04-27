@@ -7,9 +7,10 @@ import logo from '@/assets/images/logo-white.png';
 import profileDefault from '@/assets/images/profile.png';
 import { FaGoogle } from 'react-icons/fa';
 import { signIn, signOut, useSession, getProviders } from 'next-auth/react';
+import UnreadMessageCountBadge from './UnreadMessageCountBadge';
 
 const Navbar = () => {
-  const { data: session } = useSession();   // Instances of `useSession` will then have access to the session data and status.
+  const { data: session } = useSession(); // Instances of `useSession` will then have access to the session data and status.
   // console.log(session);
   const profileImage = session?.user?.image;
 
@@ -141,10 +142,7 @@ const Navbar = () => {
                     />
                   </svg>
                 </button>
-                <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
-                  2
-                  {/* <!-- Replace with the actual number of notifications --> */}
-                </span>
+                <UnreadMessageCountBadge />
               </Link>
               {/* <!-- Profile dropdown button --> */}
               <div className="relative ml-3">

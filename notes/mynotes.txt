@@ -108,7 +108,7 @@ And we also need to create a file that will contain the `Options` object for Nex
 -> We're gonna have a seperate file called `authOptions` where we want to put following object and the reason that we want to do that is because we're gonna need this in another place as well, so I just wanna have this authOptions so i can easily just export it and bring it into anywhere else we need it.
 -> utils(create this folder in root) -> authOptions.js(create this file)
 
----Server Actions---
+                                                                  ---Server Actions---
 They allow us to run server side functions in our next app. And we already have used server components which are components that render on the server. But server actions are functions that run on the server and we can essentially do anything we want with them. We can also submit forms directly to an action using the action attribute. So instead of using an onClick handler like we would with client sides
 Now actions can also be run within a client component. So they're very flexible and they can be used in different ways. And you also aren't limited to actions with forms. They can be invoked from form event handlers, even within a useEffect hook.  
 Now we briefly went over API routes and they're a vital part of Next.js, You can use them to execute server side code, It would be a good idea if you need your API routes to be exposed for other projects, but if you're building a single app like we are then actions are much more efficient and easier way to go, and we can run these function directly in our next app, we don't need to worry about setting up API routes and making extra HTTP requests
@@ -124,7 +124,7 @@ Lekin internally kya ho raha hai, wo samajhna important hai. Jab tum Server Acti
 Isliye difference ye hai: MERN me tumhara full control hota hai request lifecycle par—tum decide karte ho kaise file handle hogi, kaise stream hogi, kaise memory manage hogi. Next.js Server Actions me convenience zyada hai, lekin control thoda kam ho jata hai, especially large payloads ke case me. Isi wajah se simple form data (text, numbers, small payloads) ke liye Server Actions perfect hain, lekin image upload jaise use cases me traditional API route ya direct cloud upload (jaise Cloudinary) abhi bhi better aur safer approach hai.
 
 
----Cloudinary---
+                                                                  ---Cloudinary---
 so now we want to integrate Cloudinary. basically, we wanna be able to have the images that we select on 'add property' form to go up to cloudinary and then we want to get a response back, and we want to get the URLs for those images and put them in the database rather than just image name. 
 
 1. Create a cloudinary account
@@ -138,7 +138,7 @@ so now we want to integrate Cloudinary. basically, we wanna be able to have the 
 4. Install the cloudinary package (npm i cloudinary)
 5. Create `cloudinary.js` in config folder (this is where I wanna initialize the object and pass in our keys and that stuff)
 
--------------------------------------
+-------------------------------------Serialization-------------------------------------------
 Jab tum Next.js App Router me **Server Component se Client Component ko data pass karte ho**, tab ek important rule hota hai: data **JSON-serializable** hona chahiye. Ab “JSON-serializable” ka matlab kya hai? Simple words me, aisa data jo `JSON.stringify()` se safely string me convert ho sake aur `JSON.parse()` se wapas same structure me aa jaye. Isme sirf basic types allowed hote hain: **string, number, boolean, null, arrays, aur plain objects** (simple `{}` jisme sirf key-value pairs ho). Lekin MongoDB/Mongoose ka data is rule ko tod deta hai, kyunki wo special types use karta hai jaise `ObjectId` (Mongo ka unique ID type), `Date` objects, aur kabhi-kabhi `Buffer`. Ye objects internally methods rakhte hain (jaise `toJSON`, `toString`, etc.) aur unka structure simple JSON jaisa nahi hota. Isi wajah se Next.js error deta hai: *“Only plain objects can be passed…”*.
 
 Technical level par samjho: Next.js Server Component se Client Component ko data bhejne ke liye us data ko **serialize** karta hai (network ke through bhejne layak format me convert karta hai). Ye process almost `JSON.stringify()` jaisa hota hai. Agar kisi object me custom prototype, methods, ya complex internal structure ho (jaise `new ObjectId()`), to wo proper tarike se serialize nahi hota, aur Next.js usse reject kar deta hai. Isi ko “non-serializable data” bolte hain.
@@ -257,3 +257,72 @@ We're gonna be using `react-share` npm package which will give us little icons(f
 for navigation in client component, 
 - import {useRouter} from 'next/navigation'
 - const router = useRouter();  // initialize the router
+
+
+-------------------------------useFormState()------------------------------
+It allows us to update the state based on the result of an action and that will get passed in to useFormSttate
+useFormState() is being renamed to useActionState in react 19. Right now Next.js is using react 19.
+The functionality is supposed to be the exact same but just a differnt name
+
+useActionState()
+
+How it works?
+  1. User submits form
+  2. formAction runs submitForm
+  3. React passes:
+    - previous state
+    - FormData
+  4. Your function returns new state
+  5. React updates state automatically
+  6. isPending tracks loading
+
+---------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+we make `propertyContactForm.jsx` a client component
+---------------------------------------------------------------------------
+
+
+---------------------------------------------------------------------------
+to get the session in client component
+  - import { useSession } from 'next-auth/react';
+  - const {data: session} = useSession();
+---------------------------------------------------------------------------
+
+
+---------------------------------------------------------------------------
+we add two hidden input fields in our `propertyContactForm`, we want the propertyId and we want the recipient
+
+---------------------------------------------------------------------------
+
+---------------------------------------------------------------------------
+useFormStatus()
+const {pending, data, method, action} = useFormStatus();
+
+we wanna get this pending value because that will be set to true while it's being sent (while the form is being submitted)
+
+That will prevent like double submission and stuff like that. It adds little bit more to the user experience 
+---------------------------------------------------------------------------
+
+GLOBAL CONTEXT FOR MESSAGE COUNT
+so we've our message sending functionality. We can send message and we can view them, but we don't have a way to know if we've a new messages unless we come to the page('/messages'). so we have this hard coded 2 in red circle on bell-icon in navbar. But we want that to actually show the number of unread messages. Now since we want this to not only show but update when we click mark as read, then we have to have a connection in between this component and the navbar where this is displayed. 
+So we're going to use a context to do that. Context is a way to share state between components and doing it without passing it into a component by props. And we can do that in a few different ways like we could use an external package like redux but react has something called the context API, so that's what we're going to use
+
+We're basically gonna have a global context, so we're going to have something called unread count, but if you have other state you wanted to send across components, you could add to this global context as well
+- create a folder called `context` in the root of your project, In that create a file called `GlobalContext.js` (it's convention to use uppercase)
+- you don't have to just have a single Global context. You could have a seperate message context just for message state and you could have a property context just for property listing, but we dont have anything that we need to use context with in properties or users or anything. so we figured to just create a global.
+- context need to have something called provider and you wrap your app in this provider in order to have access to the context, so that every component in your app can get access to it.
+
+- We're also gonna create a new component and this is gonna be `UnreadMessageCount.jsx` which will ultimately be the red circle
+
+- once we have our context created then we need to actually get the number of unread messages by interacting with the database and then showing that. And we're gonna have an action that does that. so in action we create a new file called `getunreadMessageCount.js`
+
+- The next thing we have to deal with is If I click `Mark As Read` button, it's now mark as read but it's still haven't update on notification badge. we have to reload the page to see the changes. However we want that to change right when we click the button. 
+We can do that because we're sending the setUnreadCount which is what changes that unread count state and we're sending that down through the context.   
+Let's go into the `MessageCard.jsx` component which is where we're clicking the button and we will call that and bringing the context and we'll call this from there
+
+----------------------------------
+countDocuments() -> A mongoose method that return the number of documents and not the actual documents
+
+const count = await Message.countDocuments({});
+----------------------------------

@@ -5,7 +5,8 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import AuthProvider from '@/components/AuthProvider';
 import { ToastContainer } from 'react-toastify';
-import 'react-toastify/ReactToastify.css'
+import { GlobalProvider } from '@/context/GlobalContext';
+import 'react-toastify/ReactToastify.css';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -31,15 +32,17 @@ export const metadata = {
 const MainLayout = ({ children }) => {
   return (
     <AuthProvider>
-      <html className={poppins.variable}>
-        {/* <html> */}
-        <body className="flex flex-col min-h-screen">
-          <Navbar />
-          <main className="grow">{children}</main>
-          <Footer />
-          <ToastContainer />
-        </body>
-      </html>
+      <GlobalProvider>
+        <html className={poppins.variable}>
+          {/* <html> */}
+          <body className="flex flex-col min-h-screen">
+            <Navbar />
+            <main className="grow">{children}</main>
+            <Footer />
+            <ToastContainer />
+          </body>
+        </html>
+      </GlobalProvider>
     </AuthProvider>
   );
 };

@@ -321,8 +321,25 @@ We're basically gonna have a global context, so we're going to have something ca
 We can do that because we're sending the setUnreadCount which is what changes that unread count state and we're sending that down through the context.   
 Let's go into the `MessageCard.jsx` component which is where we're clicking the button and we will call that and bringing the context and we'll call this from there
 
-----------------------------------
+---------------------------------- countDocuments() -------------------------------------------------
 countDocuments() -> A mongoose method that return the number of documents and not the actual documents
 
 const count = await Message.countDocuments({});
-----------------------------------
+------------------------------------------------------------------------------------------------------
+
+---------------------------------------------------------------Pagination---------------------------------------------------------------
+we're going to implement the Pagination by getting a search params because basically we want to be able to go to `/properties?page=1`
+Remember we can get that using passing in search params if it's a server component
+
+doing Pagination with server component is definitely easier than just regular react client components
+------------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------Photoshop Lightbox------------------------------------------------------------
+Lightbox is the modal that will display the photo in a larger size when the user clicks on it.
+we're gonna be using 'react-photoswipe-gallery' (an npm package)
+you're gonna have to install two things
+  - photoswipe
+  - react-photoswipe-gallery
+
+  npm i photoswipe react-photoswipe-gallery
+------------------------------------------------------------------------------------------------------------------------------------------

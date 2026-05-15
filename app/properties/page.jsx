@@ -4,7 +4,7 @@ import connectDB from '@/config/database';
 import Property from '@/models/PropertyModel';
 
 const PropertiesPage = async ({ searchParams }) => {
-  const { page = 1, pageSize = 1 } = await searchParams;
+  const { page = 1, pageSize = 6 } = await searchParams;
   // pageSize is the number of items(properties in our case) on the page
 
   await connectDB();

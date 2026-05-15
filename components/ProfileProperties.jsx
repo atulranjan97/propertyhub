@@ -52,7 +52,7 @@ const ProfileProperties = ({ properties: initialProperties }) => {
           Edit
         </Link>
         <button
-          className="bg-red-500 text-white px-3 py-2 rounded-md hover:bg-red-600"
+          className="bg-red-500 text-white px-3 py-2 rounded-md hover:bg-red-600 cursor-pointer"
           type="button"
           onClick={() => handleDeleteProperty(property._id)}
         >
